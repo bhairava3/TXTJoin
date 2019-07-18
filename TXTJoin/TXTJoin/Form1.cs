@@ -31,7 +31,7 @@ namespace TXTJoin
             {
                 Filter = "Текстовые файлы (*.txt)|*.txt",
                 Multiselect = true,
-                Title = "Выберите файлы"
+                Title = "Выбор файлов"
             };
 
             od.ShowDialog();
@@ -41,18 +41,22 @@ namespace TXTJoin
                 return;
             }
 
+            foreach (string file in od.FileNames)
+            {                
+                FileToCollection(file);                
+            }
+
             toolStripProgressBar1.Value = 0;
-            toolStripProgressBar1.Maximum = od.FileNames.Length;
+            toolStripProgressBar1.Maximum = resultCollection.Count;
 
             int i = 1;
-            foreach (string file in od.FileNames)
+            foreach (String row in resultCollection)
             {
                 PBar(i);
-                FileToCollection(file);
                 i++;
             }
 
-            String result = string.Join(System.Environment.NewLine, resultCollection);
+            String result = string.Join(Environment.NewLine, resultCollection);
             richTextBox1.Text = result;
 
             dublicateRows = allRows - resultCollection.Count;
@@ -81,12 +85,14 @@ namespace TXTJoin
 
         private void SaveFile(object sender, EventArgs e)
         {
-            SaveFileDialog sd = new SaveFileDialog();
+            SaveFileDialog sd = new SaveFileDialog
+            {
+                Filter = "Текстовые файлы (*.txt)|*.txt",
+                Title = "Сохранение результата",
+                FileName = "Result"
+            };
 
-            sd.Filter = "Текстовые файлы (*.txt)|*.txt";
-            sd.FileName = "Result";
-
-            if (sd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (sd.ShowDialog() == DialogResult.OK)
             {
                 StreamWriter sw = new StreamWriter(sd.FileName);
 
@@ -94,19 +100,17 @@ namespace TXTJoin
 
                 sw.Close();
 
-                //listBox1.Items.Clear();
                 richTextBox1.Text = richTextBox1.Text + "Готово!";
             }
         }
-
-
-
+               
         void ShowFields()
         {
             button3.Visible = true;
             button2.Enabled = true;
             button4.Visible = true;
             сохранитьРезультатToolStripMenuItem.Visible = true;
+            toolStripProgressBar1.Visible = true;
             toolStripStatusLabel1.Visible = true;
             toolStripStatusLabel2.Visible = true;
             toolStripStatusLabel3.Visible = true;            
@@ -118,6 +122,7 @@ namespace TXTJoin
             button2.Enabled = false;
             button4.Visible = false;
             сохранитьРезультатToolStripMenuItem.Visible = false;
+            toolStripProgressBar1.Visible = false;
             toolStripStatusLabel1.Visible = false;
             toolStripStatusLabel2.Visible = false;
             toolStripStatusLabel3.Visible = false;
@@ -149,7 +154,7 @@ namespace TXTJoin
         async void PBar(int val)
         {
             toolStripProgressBar1.Value = val;
-            await Task.Delay(100);
+            await Task.Delay(1);
         }
 
         private void CopyClipboard(object sender, EventArgs e)
