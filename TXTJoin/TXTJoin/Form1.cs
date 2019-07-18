@@ -14,11 +14,7 @@ namespace TXTJoin
 {
     public partial class Form1 : Form
     {
-        HashSet<string> resultCollection = new HashSet<string>();
-
-        long allRows = 0;
-        long dublicateRows = 0;
-        long resultRows = 0;
+        long allRows, dublicateRows, resultRows;
 
         public Form1()
         {
@@ -27,6 +23,12 @@ namespace TXTJoin
 
         private void SelectFiles(object sender, EventArgs e)
         {
+            HashSet<string> resultCollection = new HashSet<string>();
+
+            allRows = 0;
+            dublicateRows = 0;
+            resultRows = 0;
+
             OpenFileDialog od = new OpenFileDialog
             {
                 Filter = "Текстовые файлы (*.txt)|*.txt",
@@ -43,7 +45,7 @@ namespace TXTJoin
 
             foreach (string file in od.FileNames)
             {                
-                FileToCollection(file);                
+                FileToCollection(file, resultCollection);                
             }
 
             toolStripProgressBar1.Value = 0;
@@ -62,6 +64,9 @@ namespace TXTJoin
             dublicateRows = allRows - resultCollection.Count;
             resultRows = resultCollection.Count;
 
+            resultCollection = null;
+            GC.Collect();
+
             toolStripStatusLabel1.Text = "Всего строк: " + allRows.ToString();
             toolStripStatusLabel2.Text = "Дублей: " + dublicateRows.ToString();
             toolStripStatusLabel3.Text = "Уникальных: " + resultRows.ToString();
@@ -70,8 +75,7 @@ namespace TXTJoin
         }
 
         private void ClearSelected(object sender, EventArgs e)
-        {
-            resultCollection.Clear();
+        {            
             richTextBox1.Text = "";
             toolStripStatusLabel1.Text = "Всего строк: 0";
             toolStripStatusLabel2.Text = "Дублей: 0";
@@ -128,7 +132,7 @@ namespace TXTJoin
             toolStripStatusLabel3.Visible = false;
         }
 
-        void FileToCollection(String filepath)
+        void FileToCollection(String filepath, HashSet<string>  resultCollection)
         {
             try
             {
@@ -139,7 +143,7 @@ namespace TXTJoin
                 {
                     s = f.ReadLine();
 
-                    resultCollection.Add(s);                    
+                    resultCollection.Add(s);
 
                     allRows++;
                 }
