@@ -48,18 +48,12 @@ namespace TXTJoin
             foreach (string file in od.FileNames)
             {
                 PBar(i);
-
-                //richTextBox1.Text = richTextBox1.Text + file + System.Environment.NewLine;
-
                 FileToCollection(file);
-
                 i++;
             }
 
-            foreach (String row in resultCollection)
-            {
-                richTextBox1.Text = richTextBox1.Text + row + System.Environment.NewLine;
-            }
+            String result = string.Join(System.Environment.NewLine, resultCollection);
+            richTextBox1.Text = result;
 
             dublicateRows = allRows - resultCollection.Count;
             resultRows = resultCollection.Count;
